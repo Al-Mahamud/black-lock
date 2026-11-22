@@ -6,6 +6,23 @@ Android app (Flutter UI + native Kotlin lock) that turns the screen pure black a
 touches, while whatever is underneath (video, music, navigation) keeps running.
 Swipe across the screen with one finger, in any direction, to unlock.
 
+## Screenshots
+
+<table>
+  <tr>
+    <td align="center"><img src="tool/screenshots/2-ready.png" width="200" alt="Home screen, ready to lock"></td>
+    <td align="center"><img src="tool/screenshots/3-delay.png" width="200" alt="5-second countdown before locking"></td>
+    <td align="center"><img src="tool/screenshots/4-ready-bottom.png" width="200" alt="Unlock options and Quick Settings tile"></td>
+    <td align="center"><img src="tool/screenshots/1-permission.png" width="200" alt="One-time overlay permission setup"></td>
+  </tr>
+  <tr>
+    <td align="center">Ready to lock</td>
+    <td align="center">5 s countdown</td>
+    <td align="center">Unlock ways &amp; tile</td>
+    <td align="center">One-time setup</td>
+  </tr>
+</table>
+
 ## How it works
 
 | Part | File |
