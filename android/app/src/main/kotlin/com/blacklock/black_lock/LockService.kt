@@ -29,7 +29,7 @@ import android.widget.Toast
  * while another app (video, music, navigation) is in front underneath it.
  *
  * Ways out, all of which call [unlock]:
- *  - a swipe on the cover (the normal way),
+ *  - drawing a V on the cover (the normal way),
  *  - pressing the power button (screen off),
  *  - the "Unlock" button on its notification, or tapping the Quick Settings tile.
  */

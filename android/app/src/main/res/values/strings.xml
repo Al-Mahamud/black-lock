@@ -5,7 +5,7 @@
     <string name="channel_name">Screen lock</string>
     <string name="notif_locked">Screen is locked</string>
     <string name="notif_pending">Locking in a few seconds…</string>
-    <string name="notif_text">Swipe across the screen to unlock</string>
+    <string name="notif_text">Draw a V on the screen to unlock</string>
     <string name="unlock">Unlock</string>
     <string name="cancel">Cancel</string>
     <string name="need_permission">Open Black Lock and allow \"Display over other apps\" first</string>

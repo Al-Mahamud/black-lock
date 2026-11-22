@@ -355,7 +355,7 @@ class _Footer extends StatelessWidget {
         const SizedBox(
           width: 290,
           child: Text(
-            'To unlock: swipe across the screen, press power, '
+            'To unlock: draw a V on the screen, press power, '
             'or tap Unlock in the notification.',
             textAlign: TextAlign.center,
             style: hint,

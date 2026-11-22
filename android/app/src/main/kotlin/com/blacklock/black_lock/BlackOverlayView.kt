@@ -12,13 +12,13 @@ import kotlin.math.min
 
 /**
  * The pure-black cover. It swallows every touch and the Back key, and calls [onUnlock]
- * when [SwipeDetector] sees a deliberate swipe in any direction.
+ * when [VGestureDetector] sees a V drawn with one finger.
  */
 @SuppressLint("ViewConstructor")
 class BlackOverlayView(context: Context, private val onUnlock: () -> Unit) : View(context) {
 
     private val density = resources.displayMetrics.density
-    private val detector = SwipeDetector(minDistancePx = 120 * density)
+    private val detector = VGestureDetector(minArmPx = 70 * density)
     private val shownAt = SystemClock.uptimeMillis()
 
     init {
@@ -30,8 +30,8 @@ class BlackOverlayView(context: Context, private val onUnlock: () -> Unit) : Vie
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
-        // At least 120dp, or 30% of the short side of the screen, whichever is longer.
-        detector.minDistancePx = max(120 * density, 0.3f * min(w, h))
+        // Each arm of the V rises at least 70dp, or 15% of the short side of the screen, whichever is longer.
+        detector.minArmPx = max(70 * density, 0.15f * min(w, h))
     }
 
     @SuppressLint("ClickableViewAccessibility")

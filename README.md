@@ -4,7 +4,7 @@
 
 Android app (Flutter UI + native Kotlin lock) that turns the screen pure black and ignores
 touches, while whatever is underneath (video, music, navigation) keeps running.
-Swipe across the screen with one finger, in any direction, to unlock.
+Draw a **V** on the screen with one finger to unlock.
 
 ## Screenshots
 
@@ -43,7 +43,7 @@ First time only: open Black Lock and tap **Open settings** to turn on "Display o
 
 **To unlock:**
 
-- **Swipe** across the screen with one finger, in any direction.
+- **Draw a V** on the screen with one finger: down to a point, then back up on the other side (either direction, within 1.5 s).
 - Tap **Unlock** on the Black Lock notification, or tap the tile again.
 - Press **Power**. This turns the screen off and ends the lock, and YouTube will usually pause because the screen is off.
 
@@ -56,7 +56,7 @@ First time only: open Black Lock and tap **Open settings** to turn on "Display o
 | Colours (pure black, one blue accent), Sora heading font, button styles | `lib/theme.dart`, `assets/fonts/` (SIL OFL) |
 | Method channel `black_lock` | `android/app/src/main/kotlin/com/blacklock/black_lock/MainActivity.kt` |
 | Black cover (overlay window) held by a foreground service | `LockService.kt`, `BlackOverlayView.kt` |
-| Unlock-swipe rule (one finger, ≥ max(120dp, 30% of short side), ≤ 1 s, fairly straight) | `SwipeDetector.kt` |
+| Unlock rule: a V (one finger, ≤ 1.5 s, two slanted, fairly straight arms on opposite sides of the lowest point, each rising ≥ max(70dp, 15% of short side)) | `VGestureDetector.kt` |
 | Quick Settings tile (+ invisible starter activity) | `LockTileService.kt`, `StartLockActivity.kt` |
 
 Other ways out: power button (screen off ends the lock), the notification's Unlock button,
@@ -69,7 +69,7 @@ Limits: Home and the notification shade can't be blocked by a normal app; Back i
 ```bash
 export PATH="$HOME/development/flutter/bin:$PATH" JAVA_HOME=$HOME/.jdks/jdk-17 ANDROID_HOME=$HOME/Android/Sdk
 flutter test                                    # Flutter screen
-(cd android && ./gradlew :app:testDebugUnitTest) # swipe rule
+(cd android && ./gradlew :app:testDebugUnitTest) # V unlock rule
 flutter build apk --release --split-per-abi      # build/app/outputs/flutter-apk/
 FLUTTER_ROOT=$HOME/development/flutter flutter test tool/screenshots_test.dart --update-goldens  # real screenshots → tool/screenshots/
 ```

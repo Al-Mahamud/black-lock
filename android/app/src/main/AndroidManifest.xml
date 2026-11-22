@@ -50,7 +50,7 @@
             android:foregroundServiceType="specialUse">
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="Keeps a black touch-blocking cover on screen, over the app the user is using, until the user swipes it away" />
+                android:value="Keeps a black touch-blocking cover on screen, over the app the user is using, until the user draws a V on it to unlock" />
         </service>
 
         <service
