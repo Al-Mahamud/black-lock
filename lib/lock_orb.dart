@@ -144,7 +144,7 @@ class _RingPainter extends CustomPainter {
       old.mode != mode || old.remaining != remaining;
 }
 
-/// The logo mark (padlock + swipe trail + fingertip), drawn as vectors so it is sharp at any size.
+/// The logo mark (padlock with a V drawn on it, ending in a fingertip), drawn as vectors so it is sharp at any size.
 class BrandGlyph extends StatelessWidget {
   const BrandGlyph({
     super.key,
@@ -195,16 +195,22 @@ class _GlyphPainter extends CustomPainter {
       RRect.fromLTRBR(31, 47, 77, 82, const Radius.circular(9)),
       Paint()..color = color,
     );
-    canvas.drawLine(
-      const Offset(39, 64.5),
-      const Offset(62, 64.5),
+    final v = Path()
+      ..moveTo(42, 55.5)
+      ..lineTo(54, 74.5)
+      ..lineTo(66, 55.5);
+    canvas.drawPath(
+      v,
       Paint()
+        ..style = PaintingStyle.stroke
         ..strokeWidth = 5
         ..strokeCap = StrokeCap.round
-        ..shader = LinearGradient(colors: [trail.withValues(alpha: 0), trail])
-            .createShader(const Rect.fromLTRB(39, 60, 62, 69)),
+        ..strokeJoin = StrokeJoin.round
+        ..shader = LinearGradient(
+          colors: [trail.withValues(alpha: 0.45), trail],
+        ).createShader(const Rect.fromLTRB(42, 53, 66, 77)),
     );
-    canvas.drawCircle(const Offset(63.5, 64.5), 5, Paint()..color = trail);
+    canvas.drawCircle(const Offset(66, 55.5), 4.5, Paint()..color = trail);
     canvas.restore();
   }
 

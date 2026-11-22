@@ -76,6 +76,6 @@ FLUTTER_ROOT=$HOME/development/flutter flutter test tool/screenshots_test.dart -
 
 ## Logo
 
-A padlock with a blue swipe trail ending in a fingertip ("slide to unlock"). Source: `docs/logo.svg` (512 px PNG beside it).
+A padlock with a blue **V** drawn on it, ending in a fingertip ("draw a V to unlock"). Source: `docs/logo.svg` (512 px PNG beside it).
 On Android: `res/drawable/ic_launcher_{background,foreground,monochrome}.xml` (adaptive + Android 13 themed icon)
 and `ic_lock.xml` (status bar, notification, tile). Brand blue `#3D7BFF` also seeds the Flutter theme.

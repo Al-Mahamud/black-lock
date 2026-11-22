@@ -3,15 +3,15 @@
     <linearGradient id="bg" x1="0" y1="18" x2="0" y2="90" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#262A33"/><stop offset="1" stop-color="#08090B"/>
     </linearGradient>
-    <linearGradient id="trail" x1="39" y1="0" x2="62" y2="0" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#3D7BFF" stop-opacity="0"/><stop offset="1" stop-color="#3D7BFF"/>
+    <linearGradient id="trail" x1="42" y1="0" x2="66" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3D7BFF" stop-opacity="0.45"/><stop offset="1" stop-color="#3D7BFF"/>
     </linearGradient>
   </defs>
   <rect x="0" y="0" width="108" height="108" fill="url(#bg)"/>
   <g transform="translate(54 54) scale(0.8) translate(-54 -53.5)">
     <path d="M41,50 V41 A13,13 0 0 1 67,41 V50" fill="none" stroke="#F4F5F7" stroke-width="6" stroke-linecap="round"/>
     <path d="M40,47 H68 A9,9 0 0 1 77,56 V73 A9,9 0 0 1 68,82 H40 A9,9 0 0 1 31,73 V56 A9,9 0 0 1 40,47 Z" fill="#F4F5F7"/>
-    <path d="M39,64.5 H62" stroke="url(#trail)" stroke-width="5" stroke-linecap="round"/>
-    <circle cx="63.5" cy="64.5" r="5" fill="#3D7BFF"/>
+    <path d="M42,55.5 L54,74.5 L66,55.5" fill="none" stroke="url(#trail)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="66" cy="55.5" r="4.5" fill="#3D7BFF"/>
   </g>
 </svg>
