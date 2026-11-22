@@ -23,6 +23,32 @@ Swipe across the screen with one finger, in any direction, to unlock.
   </tr>
 </table>
 
+## Usage: black out while a video plays (e.g. YouTube)
+
+First time only: open Black Lock and tap **Open settings** to turn on "Display over other apps".
+
+**Option 1 — Quick Settings tile (easiest)**
+
+1. In Black Lock, under **Lock from any app**, tap **Add tile** (or drag the "Black Lock" tile into Quick Settings yourself).
+2. Start your video in YouTube.
+3. Pull down the notification shade and tap the **Black Lock** tile. The shade closes and the screen goes black over the video.
+
+**Option 2 — 5-second countdown**
+
+1. Open Black Lock and tap **Lock in 5 seconds**.
+2. Within 5 seconds, switch to YouTube (Recents button or swipe between apps).
+3. When the countdown ends, the screen goes black over YouTube. The countdown runs in a background service, so it keeps going after you leave Black Lock.
+
+> Don't use the big **Lock now** button for this: it locks immediately with Black Lock itself on screen, so YouTube would be in the background, where it usually pauses.
+
+**While locked:** the video and sound keep playing, touches are ignored, the screen stays on, and the volume buttons still work.
+
+**To unlock:**
+
+- **Swipe** across the screen with one finger, in any direction.
+- Tap **Unlock** on the Black Lock notification, or tap the tile again.
+- Press **Power**. This turns the screen off and ends the lock, and YouTube will usually pause because the screen is off.
+
 ## How it works
 
 | Part | File |
