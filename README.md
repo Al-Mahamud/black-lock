@@ -10,15 +10,13 @@ Swipe across the screen with one finger, in any direction, to unlock.
 
 <table>
   <tr>
-    <td align="center"><img src="tool/screenshots/2-ready.png" width="200" alt="Home screen, ready to lock"></td>
+    <td align="center"><img src="tool/screenshots/2-ready.png" width="200" alt="Home screen: Lock now button, Lock in 5 seconds link, unlock hint and Add Quick Settings tile button"></td>
     <td align="center"><img src="tool/screenshots/3-delay.png" width="200" alt="5-second countdown before locking"></td>
-    <td align="center"><img src="tool/screenshots/4-ready-bottom.png" width="200" alt="Unlock options and Quick Settings tile"></td>
     <td align="center"><img src="tool/screenshots/1-permission.png" width="200" alt="One-time overlay permission setup"></td>
   </tr>
   <tr>
     <td align="center">Ready to lock</td>
     <td align="center">5 s countdown</td>
-    <td align="center">Unlock ways &amp; tile</td>
     <td align="center">One-time setup</td>
   </tr>
 </table>
@@ -29,7 +27,7 @@ First time only: open Black Lock and tap **Open settings** to turn on "Display o
 
 **Option 1 — Quick Settings tile (easiest)**
 
-1. In Black Lock, under **Lock from any app**, tap **Add tile** (or drag the "Black Lock" tile into Quick Settings yourself).
+1. In Black Lock, tap **Add Quick Settings tile** at the bottom (or drag the "Black Lock" tile into Quick Settings yourself).
 2. Start your video in YouTube.
 3. Pull down the notification shade and tap the **Black Lock** tile. The shade closes and the screen goes black over the video.
 
@@ -53,9 +51,9 @@ First time only: open Black Lock and tap **Open settings** to turn on "Display o
 
 | Part | File |
 | --- | --- |
-| Flutter screen (setup card, lock orb, 5 s countdown with Cancel, unlock ways, tile card) | `lib/main.dart` |
-| Lock orb (breathing glow, countdown ring) and the logo glyph drawn as vectors | `lib/lock_orb.dart` |
-| Colours, Sora heading font, glass cards | `lib/theme.dart`, `assets/fonts/` (SIL OFL) |
+| Flutter screen (minimal, one page: lock orb, setup prompt, 5 s countdown with Cancel, unlock hint, Add tile button) | `lib/main.dart` |
+| Lock orb (thin ring, draining countdown ring) and the logo glyph drawn as vectors | `lib/lock_orb.dart` |
+| Colours (pure black, one blue accent), Sora heading font, button styles | `lib/theme.dart`, `assets/fonts/` (SIL OFL) |
 | Method channel `black_lock` | `android/app/src/main/kotlin/com/blacklock/black_lock/MainActivity.kt` |
 | Black cover (overlay window) held by a foreground service | `LockService.kt`, `BlackOverlayView.kt` |
 | Unlock-swipe rule (one finger, ≥ max(120dp, 30% of short side), ≤ 1 s, fairly straight) | `SwipeDetector.kt` |

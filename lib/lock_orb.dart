@@ -8,14 +8,14 @@ import 'theme.dart';
 enum OrbMode { setup, ready, countdown }
 
 /// The big round "Lock now" button in the middle of the screen.
-/// Ready: a slowly breathing blue glow. Countdown: the ring drains and the seconds count down.
+/// A thin ring on black; during the countdown the ring drains and the seconds count down.
 class LockOrb extends StatefulWidget {
   const LockOrb({
     super.key,
     required this.mode,
     required this.onTap,
     this.countdown,
-    this.size = 236,
+    this.size = 220,
   });
 
   final OrbMode mode;
@@ -29,40 +29,8 @@ class LockOrb extends StatefulWidget {
   State<LockOrb> createState() => _LockOrbState();
 }
 
-class _LockOrbState extends State<LockOrb> with SingleTickerProviderStateMixin {
-  late final AnimationController _breath = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 2800),
-  );
+class _LockOrbState extends State<LockOrb> {
   bool _pressed = false;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _syncBreath();
-  }
-
-  @override
-  void didUpdateWidget(LockOrb old) {
-    super.didUpdateWidget(old);
-    _syncBreath();
-  }
-
-  void _syncBreath() {
-    final still = MediaQuery.of(context).disableAnimations;
-    if (widget.mode == OrbMode.ready && !still) {
-      if (!_breath.isAnimating) _breath.repeat(reverse: true);
-    } else {
-      _breath.stop();
-      _breath.value = 0.5;
-    }
-  }
-
-  @override
-  void dispose() {
-    _breath.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,42 +50,20 @@ class _LockOrbState extends State<LockOrb> with SingleTickerProviderStateMixin {
         onTapUp: enabled ? (_) => setState(() => _pressed = false) : null,
         onTap: enabled ? widget.onTap : null,
         child: AnimatedScale(
-          scale: _pressed ? 0.95 : 1,
+          scale: _pressed ? 0.96 : 1,
           duration: const Duration(milliseconds: 140),
           curve: Curves.easeOut,
           child: AnimatedBuilder(
-            animation: Listenable.merge([_breath, widget.countdown]),
+            animation: widget.countdown ?? kAlwaysCompleteAnimation,
             builder: (context, _) {
-              final glow = mode == OrbMode.setup
-                  ? 0.0
-                  : 0.35 + 0.25 * Curves.easeInOut.transform(_breath.value);
               final remaining = widget.countdown?.value ?? 1;
               return SizedBox.square(
                 dimension: widget.size,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    // soft glow
-                    Container(
-                      width: widget.size * 0.86,
-                      height: widget.size * 0.86,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: BL.accent.withValues(alpha: glow),
-                            blurRadius: 48 + 30 * glow,
-                            spreadRadius: 2,
-                          ),
-                        ],
-                      ),
-                    ),
-                    CustomPaint(
-                      size: Size.square(widget.size),
-                      painter: _RingPainter(mode: mode, remaining: remaining),
-                    ),
-                    _Centre(mode: mode, remaining: remaining),
-                  ],
+                child: CustomPaint(
+                  painter: _RingPainter(mode: mode, remaining: remaining),
+                  child: Center(
+                    child: _Centre(mode: mode, remaining: remaining),
+                  ),
                 ),
               );
             },
@@ -138,36 +84,19 @@ class _Centre extends StatelessWidget {
   Widget build(BuildContext context) {
     if (mode == OrbMode.countdown) {
       final secs = (remaining * 5).ceil().clamp(1, 5);
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text('$secs', style: BL.display(68, FontWeight.w600)),
-          const SizedBox(height: 2),
-          Text(
-            'Locking…',
-            style: BL.display(15, FontWeight.w500, color: BL.accentHi),
-          ),
-        ],
+      return Text(
+        '$secs',
+        style: BL.display(72, FontWeight.w500).copyWith(height: 1),
       );
     }
-    final ready = mode == OrbMode.ready;
     return Opacity(
-      opacity: ready ? 1 : 0.38,
+      opacity: mode == OrbMode.ready ? 1 : 0.35,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const BrandGlyph(size: 58),
-          const SizedBox(height: 16),
-          Text('Lock now', style: BL.display(20, FontWeight.w600)),
-          const SizedBox(height: 4),
-          Text(
-            ready ? 'Tap to black out' : 'Finish setup first',
-            style: const TextStyle(
-              fontSize: 12.5,
-              color: BL.muted,
-              letterSpacing: 0.2,
-            ),
-          ),
+          const BrandGlyph(size: 50),
+          const SizedBox(height: 14),
+          Text('Lock now', style: BL.display(19, FontWeight.w600)),
         ],
       ),
     );
@@ -183,65 +112,29 @@ class _RingPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final c = size.center(Offset.zero);
-    final r = size.width / 2 - 14;
-
-    // inner disc
-    canvas.drawCircle(
-      c,
-      r,
-      Paint()
-        ..shader = const RadialGradient(
-          center: Alignment(-0.3, -0.45),
-          radius: 1.0,
-          colors: [Color(0xFF1C2638), Color(0xFF0B0E15)],
-        ).createShader(Rect.fromCircle(center: c, radius: r)),
-    );
-
-    // faint outer guide ring
-    canvas.drawCircle(
-      c,
-      r + 9,
-      Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1
-        ..color = const Color(0x14FFFFFF),
-    );
-
-    final rect = Rect.fromCircle(center: c, radius: r);
-    final ring = Paint()
+    final r = size.width / 2 - 2;
+    final stroke = Paint()
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 3
+      ..strokeWidth = 2
       ..strokeCap = StrokeCap.round;
+
+    canvas.drawCircle(c, r, Paint()..color = const Color(0xFF0A0B0E));
 
     switch (mode) {
       case OrbMode.setup:
-        canvas.drawCircle(c, r, ring..color = const Color(0x24FFFFFF));
+        canvas.drawCircle(c, r, stroke..color = const Color(0x1FFFFFFF));
       case OrbMode.ready:
-        ring.shader = const SweepGradient(
-          colors: [BL.accent, BL.cyan, BL.accentHi, BL.accent],
-          stops: [0, 0.35, 0.7, 1],
-          transform: GradientRotation(-math.pi / 2),
-        ).createShader(rect);
-        canvas.drawCircle(c, r, ring);
+        canvas.drawCircle(c, r, stroke..color = BL.accent);
       case OrbMode.countdown:
-        canvas.drawCircle(
-          c,
-          r,
-          Paint()
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = 3
-            ..color = const Color(0x1FFFFFFF),
-        );
-        ring.shader = const SweepGradient(
-          colors: [BL.cyan, BL.accent],
-          transform: GradientRotation(-math.pi / 2),
-        ).createShader(rect);
+        canvas.drawCircle(c, r, stroke..color = const Color(0x1FFFFFFF));
         canvas.drawArc(
-          rect,
+          Rect.fromCircle(center: c, radius: r),
           -math.pi / 2,
           2 * math.pi * remaining,
           false,
-          ring..strokeWidth = 4,
+          stroke
+            ..color = BL.accent
+            ..strokeWidth = 3,
         );
     }
   }

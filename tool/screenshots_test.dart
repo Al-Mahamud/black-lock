@@ -3,7 +3,6 @@
 import 'dart:io';
 
 import 'package:black_lock/main.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -59,10 +58,6 @@ void main() {
 
   Future<void> open(WidgetTester tester) async {
     await tester.pumpWidget(const BlackLockApp());
-    await tester.runAsync(() async {
-      final ctx = tester.element(find.byType(Scaffold));
-      await precacheImage(const AssetImage('assets/logo.png'), ctx);
-    });
     await tester.pumpAndSettle();
   }
 
@@ -93,17 +88,6 @@ void main() {
     await expectLater(
       find.byType(BlackLockApp),
       matchesGoldenFile('screenshots/3-delay.png'),
-    );
-  });
-
-  testWidgets('4 ready, scrolled', (tester) async {
-    allowed = true;
-    await open(tester);
-    await tester.drag(find.byType(ListView), const Offset(0, -600));
-    await tester.pumpAndSettle();
-    await expectLater(
-      find.byType(BlackLockApp),
-      matchesGoldenFile('screenshots/4-ready-bottom.png'),
     );
   });
 }

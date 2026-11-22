@@ -13,7 +13,6 @@ void main() {
     final view = binding.platformDispatcher.views.first;
     view.physicalSize = const Size(1080, 2400); // a typical phone
     view.devicePixelRatio = 2.75;
-    // The orb's breathing glow repeats forever; reduced motion keeps pumpAndSettle finite.
     binding.platformDispatcher.accessibilityFeaturesTestValue =
         const FakeAccessibilityFeatures(disableAnimations: true);
     allowed = false;
@@ -37,11 +36,11 @@ void main() {
     await tester.pumpWidget(const BlackLockApp());
     await tester.pumpAndSettle();
 
-    expect(find.text('One-time setup'), findsOneWidget);
     expect(find.text('Setup needed'), findsOneWidget);
+    expect(find.text('Lock in 5 seconds'), findsNothing);
+    expect(find.text('Add Quick Settings tile'), findsNothing);
 
     await tester.tap(find.text('Lock now'));
-    await tester.tap(find.text('Lock in 5 seconds'));
     await tester.pump();
     expect(methods(), isNot(contains('lock')));
 
@@ -54,7 +53,7 @@ void main() {
     await tester.pumpWidget(const BlackLockApp());
     await tester.pumpAndSettle();
 
-    expect(find.text('One-time setup'), findsNothing);
+    expect(find.text('Open settings'), findsNothing);
     expect(find.text('Ready'), findsOneWidget);
 
     await tester.tap(find.text('Lock now'));
@@ -79,7 +78,7 @@ void main() {
     await tester.tap(find.text('Cancel'));
     await tester.pumpAndSettle();
     expect(calls.last.method, 'unlock');
-    expect(find.text('Pure black'), findsOneWidget);
+    expect(find.text('Lock in 5 seconds'), findsOneWidget);
   });
 
   testWidgets('countdown ends by itself after 5 seconds', (tester) async {
@@ -100,9 +99,7 @@ void main() {
     await tester.pumpWidget(const BlackLockApp());
     await tester.pumpAndSettle();
 
-    await tester.ensureVisible(find.text('Add tile'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Add tile'));
+    await tester.tap(find.text('Add Quick Settings tile'));
     await tester.pumpAndSettle();
     expect(find.text('Tile added to Quick Settings'), findsOneWidget);
   });

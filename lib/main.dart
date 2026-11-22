@@ -141,95 +141,74 @@ class _HomePageState extends State<HomePage>
   Widget build(BuildContext context) {
     final allowed = _allowed;
     return Scaffold(
-      body: Stack(
-        children: [
-          const _Backdrop(),
-          SafeArea(
-            child: allowed == null
-                ? const SizedBox.shrink()
-                : AnimatedBuilder(
-                    animation: _countdown,
-                    builder: (context, _) => _content(allowed),
-                  ),
-          ),
-        ],
+      body: SafeArea(
+        child: allowed == null
+            ? const SizedBox.shrink()
+            : LayoutBuilder(
+                builder: (context, box) => AnimatedBuilder(
+                  animation: _countdown,
+                  builder: (context, _) => _content(allowed, box),
+                ),
+              ),
       ),
     );
   }
 
-  Widget _content(bool allowed) {
+  /// One screen: top bar, the orb centred, the unlock hint and tile button at the bottom.
+  /// Scrolls only when the phone is too short (or the text too large) to fit it.
+  Widget _content(bool allowed, BoxConstraints box) {
+    const pad = EdgeInsets.fromLTRB(24, 12, 24, 28);
     final mode = !allowed
         ? OrbMode.setup
         : _counting
         ? OrbMode.countdown
         : OrbMode.ready;
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(20, 14, 20, 28),
-      children: [
-        _TopBar(ready: allowed),
-        const SizedBox(height: 22),
-        if (!allowed) ...[
-          _SetupCard(onOpen: LockChannel.openOverlaySettings),
-          const SizedBox(height: 18),
-        ],
-        Center(
-          child: LockOrb(
-            mode: mode,
-            countdown: _countdown,
-            onTap: () => LockChannel.lock(),
-          ),
+    return SingleChildScrollView(
+      padding: pad,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          minHeight: (box.maxHeight - pad.vertical).clamp(0, double.infinity),
         ),
-        const SizedBox(height: 14),
-        AnimatedSwitcher(
-          duration: const Duration(milliseconds: 220),
-          child: mode == OrbMode.countdown
-              ? Column(
-                  key: const ValueKey('counting'),
-                  children: [
-                    Text(
-                      'Open your video or music app now',
-                      textAlign: TextAlign.center,
-                      style: BL.display(15, FontWeight.w500),
+        child: IntrinsicHeight(
+          child: Column(
+            children: [
+              _TopBar(ready: allowed),
+              const Spacer(),
+              const SizedBox(height: 32),
+              LockOrb(
+                mode: mode,
+                countdown: _countdown,
+                onTap: () => LockChannel.lock(),
+              ),
+              const SizedBox(height: 22),
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 200),
+                layoutBuilder: (current, previous) => Stack(
+                  alignment: Alignment.topCenter,
+                  children: [...previous, ?current],
+                ),
+                child: KeyedSubtree(
+                  key: ValueKey(mode),
+                  child: switch (mode) {
+                    OrbMode.setup => _SetupPrompt(
+                      onOpen: LockChannel.openOverlaySettings,
                     ),
-                    const SizedBox(height: 6),
-                    TextButton(onPressed: _cancel, child: const Text('Cancel')),
-                  ],
-                )
-              : const _Promises(key: ValueKey('promises')),
-        ),
-        const SizedBox(height: 18),
-        _DelayButton(
-          enabled: allowed && mode != OrbMode.countdown,
-          seconds: _delay.inSeconds,
-          onPressed: _lockLater,
-        ),
-        const SizedBox(height: 30),
-        const _SectionLabel('Ways to unlock'),
-        const SizedBox(height: 12),
-        const _UnlockWays(),
-        const SizedBox(height: 30),
-        const _SectionLabel('Lock from any app'),
-        const SizedBox(height: 12),
-        _TileCard(canAdd: _canAddTile, onAdd: _addTile),
-      ],
-    );
-  }
-}
-
-/// Near-black with a cool blue glow behind the orb.
-class _Backdrop extends StatelessWidget {
-  const _Backdrop();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Positioned.fill(
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: RadialGradient(
-            center: Alignment(0, -0.48),
-            radius: 0.95,
-            colors: [Color(0xFF14213F), Color(0xFF0A0D16), BL.bg],
-            stops: [0, 0.55, 1],
+                    OrbMode.ready => _DelayLink(
+                      seconds: _delay.inSeconds,
+                      onPressed: _lockLater,
+                    ),
+                    OrbMode.countdown => _CountdownHint(onCancel: _cancel),
+                  },
+                ),
+              ),
+              const Spacer(),
+              const SizedBox(height: 32),
+              _Footer(
+                showTile: allowed,
+                canAddTile: _canAddTile,
+                onAddTile: _addTile,
+              ),
+            ],
           ),
         ),
       ),
@@ -244,386 +223,164 @@ class _TopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = ready ? BL.good : BL.amber;
-    return Row(
+    return SizedBox(
+      height: 40,
+      child: Row(
+        children: [
+          const BrandGlyph(size: 22),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'Black Lock',
+              style: BL.display(17, FontWeight.w600),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          Container(
+            width: 7,
+            height: 7,
+            decoration: BoxDecoration(
+              color: ready ? BL.good : BL.amber,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 7),
+          Text(
+            ready ? 'Ready' : 'Setup needed',
+            style: const TextStyle(fontSize: 13, color: BL.muted),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Under the orb before the overlay permission is granted.
+class _SetupPrompt extends StatelessWidget {
+  const _SetupPrompt({required this.onOpen});
+
+  final VoidCallback onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(11),
-          child: Image.asset('assets/logo.png', width: 38, height: 38),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
+        const SizedBox(
+          width: 280,
           child: Text(
-            'Black Lock',
-            style: BL.display(21, FontWeight.w600),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+            'Allow Black Lock to display over other apps to get started.',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 14, color: BL.muted, height: 1.45),
           ),
         ),
-        const SizedBox(width: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(99),
-            border: Border.all(color: color.withValues(alpha: 0.35)),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 7,
-                height: 7,
-                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-              ),
-              const SizedBox(width: 7),
-              Text(
-                ready ? 'Ready' : 'Setup needed',
-                style: TextStyle(
-                  fontSize: 12.5,
-                  fontWeight: FontWeight.w600,
-                  color: color,
-                ),
-              ),
-            ],
-          ),
+        const SizedBox(height: 14),
+        FilledButton(onPressed: onOpen, child: const Text('Open settings')),
+      ],
+    );
+  }
+}
+
+/// Under the orb when ready: the delayed lock, for locking over a video.
+class _DelayLink extends StatelessWidget {
+  const _DelayLink({required this.seconds, required this.onPressed});
+
+  final int seconds;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        TextButton.icon(
+          onPressed: onPressed,
+          icon: const Icon(Icons.timer_outlined, size: 19),
+          label: Text('Lock in $seconds seconds'),
+        ),
+        const SizedBox(height: 2),
+        const Text(
+          'Time to switch to your video or music',
+          style: TextStyle(fontSize: 12.5, color: BL.muted),
         ),
       ],
     );
   }
 }
 
-class _SetupCard extends StatelessWidget {
-  const _SetupCard({required this.onOpen});
+/// Under the orb while counting down.
+class _CountdownHint extends StatelessWidget {
+  const _CountdownHint({required this.onCancel});
 
-  final VoidCallback onOpen;
+  final VoidCallback onCancel;
 
   @override
   Widget build(BuildContext context) {
-    return Glass(
-      borderColor: BL.amber.withValues(alpha: 0.3),
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const _IconBubble(icon: Icons.layers_outlined, color: BL.amber),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  'One-time setup',
-                  style: BL.display(16, FontWeight.w600),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          const Text(
-            'Black Lock covers the screen on top of other apps. '
-            'Turn on "Display over other apps" for Black Lock, then come back.',
-            style: TextStyle(color: BL.muted, height: 1.45),
-          ),
-          const SizedBox(height: 14),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton(
-              onPressed: onOpen,
-              style: FilledButton.styleFrom(
-                minimumSize: const Size.fromHeight(46),
-              ),
-              child: const Text('Open settings'),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          height: 30,
+          child: Center(
+            child: Text(
+              'Open your video or music app now',
+              textAlign: TextAlign.center,
+              style: BL.display(15, FontWeight.w500),
             ),
           ),
-        ],
-      ),
+        ),
+        TextButton(onPressed: onCancel, child: const Text('Cancel')),
+      ],
     );
   }
 }
 
-/// Three short promises under the orb.
-class _Promises extends StatelessWidget {
-  const _Promises({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    const items = [
-      (Icons.dark_mode_outlined, 'Pure black'),
-      (Icons.do_not_touch_outlined, 'No touches'),
-      (Icons.graphic_eq, 'Sound plays on'),
-    ];
-    // One row always; on a narrow phone it scales down a little instead of wrapping.
-    return FittedBox(
-      fit: BoxFit.scaleDown,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        spacing: 6,
-        children: [
-          for (final (icon, label) in items)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-              decoration: BoxDecoration(
-                color: BL.glass,
-                borderRadius: BorderRadius.circular(99),
-                border: Border.all(color: BL.glassLine),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(icon, size: 15, color: BL.accentHi),
-                  const SizedBox(width: 6),
-                  Text(
-                    label,
-                    style: const TextStyle(fontSize: 12.5, color: BL.ink),
-                  ),
-                ],
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DelayButton extends StatelessWidget {
-  const _DelayButton({
-    required this.enabled,
-    required this.seconds,
-    required this.onPressed,
+class _Footer extends StatelessWidget {
+  const _Footer({
+    required this.showTile,
+    required this.canAddTile,
+    required this.onAddTile,
   });
 
-  final bool enabled;
-  final int seconds;
-  final VoidCallback onPressed;
+  final bool showTile;
+  final bool canAddTile;
+  final VoidCallback onAddTile;
 
   @override
   Widget build(BuildContext context) {
-    return Opacity(
-      opacity: enabled ? 1 : 0.4,
-      child: Material(
-        color: BL.glass,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: const BorderSide(color: BL.glassLine),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: enabled ? onPressed : null,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(14, 12, 16, 12),
-            child: Row(
-              children: [
-                const _IconBubble(
-                  icon: Icons.timer_outlined,
-                  color: BL.accentHi,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Lock in $seconds seconds',
-                        style: BL.display(15, FontWeight.w600),
-                      ),
-                      const SizedBox(height: 2),
-                      const Text(
-                        'Time to switch to your video or music app',
-                        style: TextStyle(fontSize: 12.5, color: BL.muted),
-                      ),
-                    ],
-                  ),
-                ),
-                const Icon(
-                  Icons.arrow_forward_rounded,
-                  size: 20,
-                  color: BL.muted,
-                ),
-              ],
-            ),
+    const hint = TextStyle(fontSize: 12.5, color: BL.muted, height: 1.5);
+    return Column(
+      children: [
+        const SizedBox(
+          width: 290,
+          child: Text(
+            'To unlock: swipe across the screen, press power, '
+            'or tap Unlock in the notification.',
+            textAlign: TextAlign.center,
+            style: hint,
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _SectionLabel extends StatelessWidget {
-  const _SectionLabel(this.text);
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) => Text(
-    text.toUpperCase(),
-    style: const TextStyle(
-      fontSize: 11.5,
-      fontWeight: FontWeight.w600,
-      letterSpacing: 1.4,
-      color: BL.faint,
-    ),
-  );
-}
-
-class _UnlockWays extends StatelessWidget {
-  const _UnlockWays();
-
-  @override
-  Widget build(BuildContext context) {
-    const ways = [
-      (Icons.swipe_rounded, 'Swipe', 'Any direction, one finger'),
-      (Icons.power_settings_new_rounded, 'Power', 'Screen off ends the lock'),
-      (
-        Icons.notifications_none_rounded,
-        'Notification',
-        'Tap Unlock in the shade',
-      ),
-    ];
-    return IntrinsicHeight(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          for (final (i, (icon, title, sub)) in ways.indexed) ...[
-            if (i > 0) const SizedBox(width: 10),
-            Expanded(
-              child: Glass(
-                radius: 18,
-                padding: const EdgeInsets.fromLTRB(12, 14, 12, 14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _IconBubble(
-                      icon: icon,
-                      color: i == 0 ? BL.accentHi : BL.muted,
-                    ),
-                    const SizedBox(height: 12),
-                    Text(title, style: BL.display(14, FontWeight.w600)),
-                    const SizedBox(height: 3),
-                    Text(
-                      sub,
-                      style: const TextStyle(
-                        fontSize: 11.5,
-                        color: BL.muted,
-                        height: 1.35,
-                      ),
-                    ),
-                  ],
-                ),
+        if (showTile) ...[
+          const SizedBox(height: 14),
+          if (canAddTile)
+            OutlinedButton.icon(
+              onPressed: onAddTile,
+              icon: const Icon(Icons.add_rounded, size: 18),
+              label: const Text('Add Quick Settings tile'),
+            )
+          else
+            const SizedBox(
+              width: 290,
+              child: Text(
+                'Tip: add the Black Lock tile in Quick Settings '
+                '(tap the pencil) to lock from any app.',
+                textAlign: TextAlign.center,
+                style: hint,
               ),
             ),
-          ],
         ],
-      ),
+      ],
     );
   }
-}
-
-class _TileCard extends StatelessWidget {
-  const _TileCard({required this.canAdd, required this.onAdd});
-
-  final bool canAdd;
-  final VoidCallback onAdd;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(22),
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0x593D7BFF), Color(0x0F3D7BFF), Color(0x1AFFFFFF)],
-        ),
-      ),
-      padding: const EdgeInsets.all(1),
-      child: Container(
-        decoration: BoxDecoration(
-          color: const Color(0xFF0D111B),
-          borderRadius: BorderRadius.circular(21),
-        ),
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // A miniature of the Quick Settings tile, so people know what to look for.
-            Container(
-              padding: const EdgeInsets.fromLTRB(12, 9, 16, 9),
-              decoration: BoxDecoration(
-                color: const Color(0xFFA9C2FF),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const BrandGlyph(
-                    size: 18,
-                    color: Color(0xFF0E1D45),
-                    trail: Color(0xFFA9C2FF),
-                  ),
-                  const SizedBox(width: 10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Black Lock',
-                        style: BL.display(
-                          13,
-                          FontWeight.w600,
-                          color: const Color(0xFF0E1D45),
-                        ),
-                      ),
-                      const Text(
-                        'Tap to lock',
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Color(0xFF34477A),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 14),
-            const Text(
-              'Add the Black Lock tile to Quick Settings. Then pull down the shade '
-              'and tap it while your video or music is open.',
-              style: TextStyle(color: BL.muted, height: 1.45),
-            ),
-            const SizedBox(height: 14),
-            if (canAdd)
-              FilledButton.icon(
-                onPressed: onAdd,
-                icon: const Icon(Icons.add_rounded, size: 20),
-                label: const Text('Add tile'),
-                style: FilledButton.styleFrom(minimumSize: const Size(0, 44)),
-              )
-            else
-              const Text(
-                'Open Quick Settings, tap the pencil, and drag Black Lock in.',
-                style: TextStyle(color: BL.ink, fontSize: 13),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _IconBubble extends StatelessWidget {
-  const _IconBubble({required this.icon, required this.color});
-
-  final IconData icon;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) => Container(
-    width: 36,
-    height: 36,
-    decoration: BoxDecoration(
-      color: color.withValues(alpha: 0.12),
-      borderRadius: BorderRadius.circular(11),
-    ),
-    child: Icon(icon, size: 19, color: color),
-  );
 }

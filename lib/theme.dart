@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 
-/// Black Lock's look: near-black, one electric blue, frosted-glass cards.
+/// Black Lock's look: pure black, white text, one blue accent.
 abstract final class BL {
-  static const bg = Color(0xFF07080B);
+  static const bg = Color(0xFF000000);
   static const ink = Color(0xFFEEF1F6);
   static const muted = Color(0xFF8C94A6);
-  static const faint = Color(0xFF5B6273);
   static const accent = Color(0xFF3D7BFF);
   static const accentHi = Color(0xFF8DB2FF);
-  static const cyan = Color(0xFF6FD3FF);
+
+  /// Darker blue for filled buttons, so their white label stays readable (≥ 4.5:1).
+  static const accentDeep = Color(0xFF2E66E8);
   static const good = Color(0xFF34D399);
   static const amber = Color(0xFFFBBF24);
-  static const glass = Color(0x0FFFFFFF);
-  static const glassLine = Color(0x1AFFFFFF);
+  static const hairline = Color(0x24FFFFFF);
 
   /// Sora is a variable font: the weight goes through the 'wght' axis as well.
   static TextStyle display(
@@ -34,49 +34,41 @@ abstract final class BL {
       seedColor: accent,
       brightness: Brightness.dark,
     ).copyWith(primary: accent, onPrimary: Colors.white, surface: bg);
+    const label = TextStyle(
+      fontFamily: 'Roboto',
+      fontSize: 15,
+      fontWeight: FontWeight.w600,
+    );
     return ThemeData(
       colorScheme: scheme,
       scaffoldBackgroundColor: bg,
       splashFactory: InkSparkle.splashFactory,
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: accent,
+          backgroundColor: accentDeep,
           foregroundColor: Colors.white,
-          textStyle: const TextStyle(
-            fontFamily: 'Roboto',
-            fontSize: 14.5,
-            fontWeight: FontWeight.w600,
-          ),
+          textStyle: label,
+          minimumSize: const Size(0, 46),
+          padding: const EdgeInsets.symmetric(horizontal: 28),
         ),
       ),
-    );
-  }
-}
-
-/// A frosted card: faint white fill, hairline border.
-class Glass extends StatelessWidget {
-  const Glass({
-    super.key,
-    required this.child,
-    this.padding = const EdgeInsets.all(16),
-    this.radius = 22,
-    this.borderColor = BL.glassLine,
-  });
-
-  final Widget child;
-  final EdgeInsets padding;
-  final double radius;
-  final Color borderColor;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: BL.glass,
-        borderRadius: BorderRadius.circular(radius),
-        border: Border.all(color: borderColor),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: accentHi,
+          textStyle: label,
+          minimumSize: const Size(0, 44),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+        ),
       ),
-      child: Padding(padding: padding, child: child),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: ink,
+          side: const BorderSide(color: hairline),
+          textStyle: label.copyWith(fontSize: 14, fontWeight: FontWeight.w500),
+          minimumSize: const Size(0, 44),
+          padding: const EdgeInsets.symmetric(horizontal: 18),
+        ),
+      ),
     );
   }
 }
