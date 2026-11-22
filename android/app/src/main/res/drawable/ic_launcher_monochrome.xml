@@ -1,0 +1,10 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <group android:scaleX="0.8" android:scaleY="0.8" android:translateX="10.8" android:translateY="11.2">
+        <path android:pathData="M41,50 V41 A13,13 0 0 1 67,41 V50"
+            android:strokeColor="#FFFFFFFF" android:strokeWidth="6" android:strokeLineCap="round" />
+        <!-- body with the swipe trail cut out -->
+        <path android:pathData="M40,47 H68 A9,9 0 0 1 77,56 V73 A9,9 0 0 1 68,82 H40 A9,9 0 0 1 31,73 V56 A9,9 0 0 1 40,47 Z M39,62 H59.17 A5,5 0 1 1 59.17,67 H39 A2.5,2.5 0 0 1 39,62 Z" android:fillType="evenOdd" android:fillColor="#FFFFFFFF" />
+    </group>
+</vector>

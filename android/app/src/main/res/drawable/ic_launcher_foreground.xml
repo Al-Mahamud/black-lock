@@ -1,0 +1,20 @@
+<!-- Black Lock mark: a padlock with a swipe trail ending in a fingertip ("slide to unlock"). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <group android:scaleX="0.8" android:scaleY="0.8"
+        android:translateX="10.8" android:translateY="11.2">
+        <path android:pathData="M41,50 V41 A13,13 0 0 1 67,41 V50"
+            android:strokeColor="#FFF4F5F7" android:strokeWidth="6" android:strokeLineCap="round" />
+        <path android:pathData="M40,47 H68 A9,9 0 0 1 77,56 V73 A9,9 0 0 1 68,82 H40 A9,9 0 0 1 31,73 V56 A9,9 0 0 1 40,47 Z" android:fillColor="#FFF4F5F7" />
+        <path android:pathData="M39,64.5 H62" android:strokeWidth="5" android:strokeLineCap="round">
+            <aapt:attr name="android:strokeColor">
+                <gradient android:type="linear"
+                    android:startX="39" android:startY="64.5" android:endX="62" android:endY="64.5"
+                    android:startColor="#003D7BFF" android:endColor="#FF3D7BFF" />
+            </aapt:attr>
+        </path>
+        <path android:pathData="M58.5,64.5 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0" android:fillColor="#FF3D7BFF" />
+    </group>
+</vector>

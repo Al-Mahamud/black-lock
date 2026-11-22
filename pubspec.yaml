@@ -1,0 +1,25 @@
+name: black_lock
+description: "Black screen that ignores touches; swipe to unlock."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.13.5
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/logo.png
+  fonts:
+    - family: Sora # SIL Open Font License, assets/fonts/OFL.txt
+      fonts:
+        - asset: assets/fonts/Sora.ttf

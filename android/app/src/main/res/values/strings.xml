@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Black Lock</string>
+    <string name="tile_label">Black Lock</string>
+    <string name="channel_name">Screen lock</string>
+    <string name="notif_locked">Screen is locked</string>
+    <string name="notif_pending">Locking in a few seconds…</string>
+    <string name="notif_text">Swipe across the screen to unlock</string>
+    <string name="unlock">Unlock</string>
+    <string name="cancel">Cancel</string>
+    <string name="need_permission">Open Black Lock and allow \"Display over other apps\" first</string>
+    <string name="lock_failed">Could not cover the screen</string>
+</resources>
